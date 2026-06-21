@@ -1,46 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <!--
-TRS MATCH RESULT TEMPLATE — 4 SLIDES
-Distinct from editorial carousel — broadcast graphic language
+TRS MATCH RESULT TEMPLATE v2 — 4 SLIDES
+Broadcast graphic language — diagonal color cuts, dual team colors
 Variables injected by n8n before POST to hcti.io
-
-SLIDE VARIABLES:
-{{S1_ACTIVE}} {{S2_ACTIVE}} {{S3_ACTIVE}} {{S4_ACTIVE}}
 
 TEAM / MATCH:
 {{HOME_TEAM}} {{HOME_CODE}} {{HOME_COLOR}} {{HOME_SCORE}}
 {{AWAY_TEAM}} {{AWAY_CODE}} {{AWAY_COLOR}} {{AWAY_SCORE}}
 {{MATCH_DATE}} {{GROUP}} {{VENUE}} {{STAGE}}
 
-SLIDE 1 — SCOREBOARD:
-(uses above team/match vars only)
+SLIDE 2: {{MOMENT_LABEL}} {{MOMENT_STAT}} {{MOMENT_UNIT}} {{MOMENT_BODY}}
+         {{MOMENT_SUB1_NUM}} {{MOMENT_SUB1_LABEL}}
+         {{MOMENT_SUB2_NUM}} {{MOMENT_SUB2_LABEL}}
 
-SLIDE 2 — THE MOMENT:
-{{MOMENT_STAT}}        — hero number (e.g. 6, 78%, 14)
-{{MOMENT_UNIT}}        — unit label (e.g. GOALS, POSSESSION, SHOTS)
-{{MOMENT_LABEL}}       — section label (e.g. THE MOMENT)
-{{MOMENT_SUB1_NUM}} {{MOMENT_SUB1_LABEL}}
-{{MOMENT_SUB2_NUM}} {{MOMENT_SUB2_LABEL}}
-{{MOMENT_BODY}}        — one punchy sentence, max 20 words
+SLIDE 3: {{METRIC1-5_LABEL}} {{METRIC1-5_HOME}} {{METRIC1-5_AWAY}}
+         {{METRIC1-5_HOME_COLOR}} {{METRIC1-5_AWAY_COLOR}}
+         {{METRIC1-5_HOME_VAL_COLOR}} {{METRIC1-5_AWAY_VAL_COLOR}}
+         {{METRIC1-5_HOME_W}} (bar width % for home, 0-100)
+         {{METRIC1-5_AWAY_W}} (bar width % for away, 0-100)
 
-SLIDE 3 — THE BREAKDOWN:
-{{METRIC1_LABEL}} {{METRIC1_HOME}} {{METRIC1_AWAY}} {{METRIC1_HOME_W}}
-{{METRIC2_LABEL}} {{METRIC2_HOME}} {{METRIC2_AWAY}} {{METRIC2_HOME_W}}
-{{METRIC3_LABEL}} {{METRIC3_HOME}} {{METRIC3_AWAY}} {{METRIC3_HOME_W}}
-{{METRIC4_LABEL}} {{METRIC4_HOME}} {{METRIC4_AWAY}} {{METRIC4_HOME_W}}
-{{METRIC5_LABEL}} {{METRIC5_HOME}} {{METRIC5_AWAY}} {{METRIC5_HOME_W}}
-Note: {{METRICX_HOME_W}} = "true" if home team won that metric, else "false"
-
-SLIDE 4 — VERDICT + NEXT:
-{{VERDICT_LINE}}       — one-line TRS verdict, max 12 words, Bebas Neue
-{{NEXT1_TIME}} {{NEXT1_MATCH}} {{NEXT1_DATE}}
-{{NEXT2_TIME}} {{NEXT2_MATCH}} {{NEXT2_DATE}}
-{{SO_LINE}}            — editorial sign-off, max 8 words
-
-hcti.io POST:
-{ "html": "...", "selector": "#slide-render",
-  "ms_delay": 300, "viewport_width": 1080, "viewport_height": 1080 }
+SLIDE 4: {{VERDICT_LINE}} {{VERDICT_VOLT}} (volt word/phrase in verdict)
+         {{NEXT1_DATE}} {{NEXT1_MATCH}}
+         {{NEXT2_DATE}} {{NEXT2_MATCH}}
+         {{SO_LINE}}
+         {{SCORE_PILL}} (e.g. "CAN 6–0 QAT")
 -->
 <head>
 <meta charset="UTF-8">
@@ -54,282 +38,155 @@ body{background:#0a0a0a;margin:0;padding:0}
   position:relative;overflow:hidden;
   background:#0a0a0a;font-family:'Inter',sans-serif;
 }
-
-/* Grain */
 .grain{position:absolute;inset:0;z-index:50;pointer-events:none;opacity:0.45;mix-blend-mode:overlay}
-
-/* Slides */
 .slide{position:absolute;inset:0;display:none;flex-direction:column}
 .slide.active{display:flex}
+.bug{position:absolute;top:44px;left:48px;z-index:20;font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:8px;color:#AAFF00}
+.sc{position:absolute;bottom:36px;right:44px;z-index:20;font-family:'Bebas Neue',sans-serif;font-size:36px;color:rgba(170,255,0,0.18);letter-spacing:3px;line-height:1}
+/* Score pill — appears on slides 2 3 4 */
+.score-pill{position:absolute;top:44px;right:48px;z-index:20;background:rgba(0,0,0,0.5);border:1px solid rgba(170,255,0,0.25);padding:10px 24px;border-radius:4px;font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:4px;color:#AAFF00}
+/* Volt left accent bar */
+.v-bar{position:absolute;left:0;top:0;bottom:0;width:8px;background:#AAFF00;z-index:10}
 
-/* Global chrome */
-.bug{position:absolute;top:44px;left:48px;z-index:20;
-  font-family:'Bebas Neue',sans-serif;font-size:24px;
-  letter-spacing:8px;color:#AAFF00}
-.sc{position:absolute;bottom:36px;right:44px;z-index:20;
-  font-family:'Bebas Neue',sans-serif;font-size:36px;
-  color:rgba(170,255,0,0.18);letter-spacing:3px;line-height:1}
-
-/* ══════════════════════════════════════
-   SLIDE 1 — SCOREBOARD
-   Vertical split: home color left, away color right
-   Giant scoreline centered across the divide
-══════════════════════════════════════ */
-#s1 .home-half{
-  position:absolute;top:0;left:0;bottom:0;width:50%;
-  background:{{HOME_COLOR}}
-}
-#s1 .away-half{
-  position:absolute;top:0;right:0;bottom:0;width:50%;
-  background:{{AWAY_COLOR}}
-}
-#s1 .center-darken{
+/* ══ SLIDE 1 — SCOREBOARD ══
+   Diagonal split: home color fills top-left zone
+   Away color fills bottom-right zone
+   Volt diagonal slash across center
+══ */
+#s1 .home-zone{
   position:absolute;inset:0;
-  background:linear-gradient(90deg,
-    rgba(0,0,0,0.55) 0%,
-    rgba(0,0,0,0.2) 40%,
-    rgba(0,0,0,0.2) 60%,
-    rgba(0,0,0,0.55) 100%)
+  background:{{HOME_COLOR}};
+  clip-path:polygon(0 0, 100% 0, 55% 100%, 0 100%)
 }
-/* Volt vertical divider */
-#s1 .divider{
-  position:absolute;top:0;bottom:0;left:50%;
-  width:4px;background:#AAFF00;
-  transform:translateX(-50%);z-index:5
+#s1 .away-zone{
+  position:absolute;inset:0;
+  background:{{AWAY_COLOR}};
+  clip-path:polygon(100% 0, 100% 100%, 55% 100%)
+}
+#s1 .darken{
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(0,0,0,0.6) 0%,rgba(0,0,0,0.1) 45%,rgba(0,0,0,0.5) 100%)
+}
+/* Diagonal volt slash */
+#s1 .slash{
+  position:absolute;inset:0;z-index:5;
+  background:linear-gradient(
+    to bottom right,
+    transparent calc(50% - 3px),
+    #AAFF00 calc(50% - 3px),
+    #AAFF00 calc(50% + 3px),
+    transparent calc(50% + 3px)
+  );
+  transform:rotate(-15deg) scale(1.5)
 }
 #s1 .inner{
-  position:relative;z-index:10;
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:0
+  position:relative;z-index:10;flex:1;display:flex;
+  flex-direction:column;align-items:center;justify-content:center
 }
-/* Stage / group label */
-#s1 .stage-label{
-  font-size:26px;letter-spacing:8px;color:rgba(255,255,255,0.45);
-  text-transform:uppercase;font-weight:400;margin-bottom:56px
-}
-/* Team row */
-#s1 .teams-row{
-  display:flex;align-items:center;justify-content:center;
-  width:100%;gap:0
-}
-#s1 .team-block{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;gap:20px
-}
-#s1 .team-code{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:144px;color:#fff;letter-spacing:8px;line-height:1
-}
-#s1 .team-name{
-  font-size:26px;color:rgba(255,255,255,0.45);
-  letter-spacing:6px;text-transform:uppercase;font-weight:400
-}
-/* Score block */
-#s1 .score-block{
-  display:flex;align-items:center;gap:0;
-  padding:0 40px;flex-shrink:0
-}
-#s1 .score-num{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:320px;line-height:0.88;color:#AAFF00;
-  letter-spacing:-12px
-}
-#s1 .score-sep{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:140px;color:rgba(255,255,255,0.2);
-  padding:0 20px;line-height:1
-}
-/* FT badge */
-#s1 .ft-badge{
-  margin-top:48px;
-  font-size:26px;letter-spacing:8px;
-  color:rgba(170,255,0,0.5);font-weight:600;
-  text-transform:uppercase
-}
+#s1 .stage-label{font-size:22px;letter-spacing:8px;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:48px;font-weight:400}
+#s1 .teams-row{display:flex;align-items:center;justify-content:center;width:100%}
+#s1 .team-block{flex:1;display:flex;flex-direction:column;align-items:center;gap:16px}
+#s1 .team-code{font-family:'Bebas Neue',sans-serif;font-size:144px;color:#fff;letter-spacing:8px;line-height:1}
+#s1 .team-name{font-size:22px;color:rgba(255,255,255,0.5);letter-spacing:4px;text-transform:uppercase}
+#s1 .score-block{display:flex;align-items:center;padding:0 32px;flex-shrink:0}
+#s1 .score-num{font-family:'Bebas Neue',sans-serif;font-size:320px;line-height:0.88;color:#AAFF00;letter-spacing:-12px}
+#s1 .score-sep{font-family:'Bebas Neue',sans-serif;font-size:140px;color:rgba(255,255,255,0.2);padding:0 20px;line-height:1}
+#s1 .ft-badge{margin-top:40px;font-size:22px;letter-spacing:6px;color:rgba(170,255,0,0.55);font-weight:600;text-transform:uppercase}
 
-/* ══════════════════════════════════════
-   SLIDE 2 — THE MOMENT
-   Dark base, one colossal volt number
-   Two supporting stats below a rule
-══════════════════════════════════════ */
+/* ══ SLIDE 2 — THE MOMENT ══ */
 #s2{background:#0a0a0a}
-#s2 .team-wash{
-  position:absolute;right:0;top:0;bottom:0;width:50%;
-  background:linear-gradient(to left,{{HOME_COLOR}} 0%,transparent 100%);
-  opacity:0.12;pointer-events:none
-}
-#s2 .accent-bar{
-  position:absolute;left:0;top:0;bottom:0;width:8px;background:{{HOME_COLOR}}
-}
-#s2 .ghost{
-  position:absolute;font-family:'Bebas Neue',sans-serif;
-  font-size:560px;line-height:1;color:{{HOME_COLOR}};opacity:0.06;
-  right:-20px;bottom:-40px;letter-spacing:-20px;pointer-events:none
-}
-#s2 .inner{
-  position:relative;z-index:5;flex:1;display:flex;
-  flex-direction:column;padding:44px 56px 44px 72px;justify-content:center
-}
-#s2 .moment-label{
-  font-size:20px;letter-spacing:8px;color:#AAFF00;
-  text-transform:uppercase;font-weight:600;margin-bottom:24px
-}
-#s2 .moment-num{
-  font-family:'Bebas Neue',sans-serif;font-size:300px;
-  line-height:0.82;color:#AAFF00;letter-spacing:-12px
-}
-#s2 .moment-unit{
-  font-family:'Bebas Neue',sans-serif;font-size:80px;
-  color:#fff;letter-spacing:2px;display:block;margin-top:12px;line-height:1
-}
-#s2 .moment-body{
-  font-size:36px;color:#fff;font-weight:300;
-  line-height:1.5;margin-top:28px;max-width:820px
-}
+#s2 .home-wash{position:absolute;left:0;top:0;bottom:0;width:60%;background:linear-gradient(to right,{{HOME_COLOR}} 0%,transparent 100%);opacity:0.14;pointer-events:none}
+#s2 .away-wash{position:absolute;right:0;top:0;bottom:0;width:40%;background:linear-gradient(to left,{{AWAY_COLOR}} 0%,transparent 100%);opacity:0.1;pointer-events:none}
+#s2 .ghost{position:absolute;font-family:'Bebas Neue',sans-serif;font-size:560px;line-height:1;color:{{HOME_COLOR}};opacity:0.07;right:-20px;bottom:-40px;letter-spacing:-20px;pointer-events:none}
+#s2 .inner{position:relative;z-index:5;flex:1;display:flex;flex-direction:column;padding:44px 56px 44px 72px;justify-content:center}
+#s2 .moment-label{font-size:20px;letter-spacing:8px;color:#AAFF00;text-transform:uppercase;font-weight:600;margin-bottom:24px}
+#s2 .moment-num{font-family:'Bebas Neue',sans-serif;font-size:300px;line-height:0.82;color:#AAFF00;letter-spacing:-12px}
+#s2 .moment-unit{font-family:'Bebas Neue',sans-serif;font-size:80px;color:#fff;letter-spacing:2px;display:block;margin-top:12px;line-height:1}
+#s2 .moment-body{font-size:36px;color:#fff;font-weight:300;line-height:1.5;margin-top:28px;max-width:820px}
 #s2 .sub-rule{width:100%;height:1px;background:#1a1a1a;margin:32px 0}
 #s2 .sub-stats{display:flex;gap:0}
-#s2 .sub-block{
-  flex:1;border-right:1px solid #1a1a1a;
-  padding-right:32px;margin-right:32px
-}
+#s2 .sub-block{flex:1;border-right:1px solid #1a1a1a;padding-right:32px;margin-right:32px}
 #s2 .sub-block:last-child{border-right:none;padding-right:0;margin-right:0}
-#s2 .sub-num{
-  font-family:'Bebas Neue',sans-serif;font-size:72px;
-  color:#AAFF00;line-height:1
-}
-#s2 .sub-label{
-  font-size:18px;color:#fff;letter-spacing:3px;
-  text-transform:uppercase;margin-top:6px;font-weight:500
-}
+#s2 .sub-num{font-family:'Bebas Neue',sans-serif;font-size:72px;color:#AAFF00;line-height:1}
+#s2 .sub-label{font-size:18px;color:#fff;letter-spacing:3px;text-transform:uppercase;margin-top:6px;font-weight:500}
 
-/* ══════════════════════════════════════
-   SLIDE 3 — THE BREAKDOWN
-   5-metric head-to-head comparison
-   Home color left bars, away color right bars
-══════════════════════════════════════ */
+/* ══ SLIDE 3 — HEAD TO HEAD ══ */
 #s3{background:#0a0a0a}
-#s3 .inner{
-  position:relative;z-index:5;flex:1;display:flex;
-  flex-direction:column;padding:36px 56px;justify-content:center
-}
-#s3 .breakdown-label{
-  font-size:22px;letter-spacing:8px;color:#AAFF00;
-  text-transform:uppercase;font-weight:600;margin-bottom:12px
-}
-#s3 .team-headers{
-  display:flex;justify-content:space-between;
-  margin-bottom:28px;align-items:baseline
-}
-#s3 .th-home{
-  font-family:'Bebas Neue',sans-serif;font-size:80px;
-  letter-spacing:4px;line-height:1
-}
-#s3 .th-away{
-  font-family:'Bebas Neue',sans-serif;font-size:80px;
-  letter-spacing:4px;line-height:1;text-align:right
-}
-/* Each metric row */
-.metric-row{margin-bottom:22px}
-.metric-label{
-  font-size:22px;color:rgba(255,255,255,0.45);
-  letter-spacing:4px;text-transform:uppercase;
-  text-align:center;margin-bottom:12px;font-weight:500
-}
-.metric-bars{display:flex;align-items:center;gap:16px}
-.metric-val-home{
-  font-family:'Bebas Neue',sans-serif;font-size:72px;
-  line-height:1;width:140px;text-align:right;flex-shrink:0
-}
-.metric-val-away{
-  font-family:'Bebas Neue',sans-serif;font-size:72px;
-  line-height:1;width:140px;text-align:left;flex-shrink:0
-}
-.metric-val-home.winner{color:#AAFF00}
-.metric-val-home.loser{color:rgba(255,255,255,0.25)}
-.metric-val-away.winner{color:#AAFF00}
-.metric-val-away.loser{color:rgba(255,255,255,0.25)}
-.bar-container{flex:1;display:flex;align-items:center;gap:3px;height:16px}
-.bar-home{height:16px;border-radius:2px}
-.bar-away{height:16px;border-radius:2px}
-.bar-home.winner{background:{{HOME_COLOR}}}
-.bar-home.loser{background:rgba(255,255,255,0.08)}
-.bar-away.winner{background:{{AWAY_COLOR}}}
-.bar-away.loser{background:rgba(255,255,255,0.08)}
-.bar-divider{width:2px;height:24px;background:#2a2a2a;flex-shrink:0}
+#s3 .home-edge{position:absolute;left:0;top:0;bottom:0;width:6px;background:{{HOME_COLOR}}}
+#s3 .away-edge{position:absolute;right:0;top:0;bottom:0;width:6px;background:{{AWAY_COLOR}}}
+#s3 .ghost{position:absolute;font-family:'Bebas Neue',sans-serif;font-size:480px;line-height:1;color:#AAFF00;opacity:0.03;left:50%;top:50%;transform:translate(-50%,-50%);letter-spacing:-16px;pointer-events:none;white-space:nowrap}
+#s3 .inner{position:relative;z-index:5;flex:1;display:flex;flex-direction:column;padding:36px 64px;justify-content:center}
+#s3 .breakdown-label{font-size:20px;letter-spacing:8px;color:#AAFF00;text-transform:uppercase;font-weight:600;margin-bottom:12px}
+#s3 .team-headers{display:flex;justify-content:space-between;margin-bottom:24px;align-items:baseline}
+#s3 .th-home{font-family:'Bebas Neue',sans-serif;font-size:80px;letter-spacing:4px;line-height:1;color:{{HOME_COLOR}}}
+#s3 .th-away{font-family:'Bebas Neue',sans-serif;font-size:80px;letter-spacing:4px;line-height:1;text-align:right;color:{{AWAY_COLOR}}}
+.metric-row{margin-bottom:20px}
+.metric-label{font-size:20px;color:rgba(255,255,255,0.4);letter-spacing:4px;text-transform:uppercase;text-align:center;margin-bottom:10px;font-weight:500}
+.metric-bars{display:flex;align-items:center;gap:12px}
+.metric-val-home{font-family:'Bebas Neue',sans-serif;font-size:72px;line-height:1;width:140px;text-align:right;flex-shrink:0}
+.metric-val-away{font-family:'Bebas Neue',sans-serif;font-size:72px;line-height:1;width:140px;text-align:left;flex-shrink:0}
+.bar-wrap{flex:1;display:flex;align-items:center;gap:3px;height:16px}
+.bar-h{height:16px;border-radius:2px;margin-left:auto}
+.bar-a{height:16px;border-radius:2px}
+.bar-div{width:2px;height:24px;background:#222;flex-shrink:0}
 
-/* ══════════════════════════════════════
-   SLIDE 4 — VERDICT + NEXT
-   Top 55%: verdict statement
-   Bottom 45%: next fixtures
-══════════════════════════════════════ */
-#s4{background:#0a0a0a}
-#s4 .top-zone{
-  position:absolute;top:0;left:0;right:0;height:55%;
-  background:{{HOME_COLOR}};opacity:0.15
+/* ══ SLIDE 4 — VERDICT + NEXT ══
+   Diagonal split: home color top-left, away color bottom-right
+   Volt diagonal slash as divider
+══ */
+#s4 .home-zone{
+  position:absolute;inset:0;
+  background:{{HOME_COLOR}};
+  clip-path:polygon(0 0, 100% 0, 100% 48%, 0 62%);
+  opacity:0.18
 }
-#s4 .volt-rule{
-  position:absolute;top:55%;left:0;right:0;
-  height:3px;background:#AAFF00;z-index:5
+#s4 .away-zone{
+  position:absolute;inset:0;
+  background:{{AWAY_COLOR}};
+  clip-path:polygon(0 62%, 100% 48%, 100% 100%, 0 100%);
+  opacity:0.18
 }
-#s4 .inner{
-  position:relative;z-index:10;flex:1;display:flex;
-  flex-direction:column;padding:44px 56px
+#s4 .slash{
+  position:absolute;top:0;left:0;right:0;bottom:0;z-index:5;
+  background:linear-gradient(
+    to bottom,
+    transparent calc(55% - 2px),
+    #AAFF00 calc(55% - 2px),
+    #AAFF00 calc(55% + 2px),
+    transparent calc(55% + 2px)
+  );
+  transform:rotate(-3deg) scale(1.1)
 }
-#s4 .verdict-section{
-  flex:0 0 55%;display:flex;flex-direction:column;justify-content:center
-}
-#s4 .verdict-eyebrow{
-  font-size:18px;letter-spacing:8px;color:#AAFF00;
-  text-transform:uppercase;font-weight:600;margin-bottom:20px
-}
-#s4 .verdict-line{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:88px;line-height:0.9;color:#fff;letter-spacing:-1px
-}
-#s4 .next-section{
-  flex:0 0 45%;display:flex;flex-direction:column;justify-content:center;
-  padding-top:24px
-}
-#s4 .next-label{
-  font-size:16px;letter-spacing:6px;color:rgba(170,255,0,0.5);
-  text-transform:uppercase;font-weight:600;margin-bottom:16px
-}
-#s4 .next-row{
-  display:flex;align-items:center;gap:20px;
-  padding:14px 0;border-bottom:1px solid #161616
-}
-#s4 .next-row:last-child{border-bottom:none}
-#s4 .next-date{
-  font-family:'Bebas Neue',sans-serif;font-size:28px;
-  color:#AAFF00;width:80px;flex-shrink:0;line-height:1
-}
-#s4 .next-pipe{width:1px;height:40px;background:#1e1e1e;flex-shrink:0}
-#s4 .next-match{font-size:26px;color:#fff;font-weight:500;flex:1}
-#s4 .next-comp{font-size:18px;color:rgba(255,255,255,0.35);margin-top:3px}
-#s4 .so-line{
-  font-size:22px;color:rgba(170,255,0,0.4);font-style:italic;
-  font-weight:300;margin-top:auto;padding-top:16px
-}
+#s4 .inner{position:relative;z-index:10;flex:1;display:flex;flex-direction:column;padding:44px 56px}
+#s4 .verdict-section{flex:0 0 55%;display:flex;flex-direction:column;justify-content:center}
+#s4 .verdict-eyebrow{font-size:18px;letter-spacing:8px;color:#AAFF00;text-transform:uppercase;font-weight:600;margin-bottom:20px}
+#s4 .verdict-line{font-family:'Bebas Neue',sans-serif;font-size:88px;line-height:0.9;color:#fff;letter-spacing:-1px}
+#s4 .verdict-line span{color:#AAFF00}
+#s4 .next-section{flex:0 0 45%;display:flex;flex-direction:column;justify-content:center;padding-top:20px}
+#s4 .next-label{font-size:16px;letter-spacing:6px;color:rgba(170,255,0,0.5);text-transform:uppercase;font-weight:600;margin-bottom:14px}
+#s4 .next-row{display:flex;align-items:center;gap:20px;padding:14px 0;border-bottom:1px solid #1a1a1a}
+#s4 .next-row:last-of-type{border-bottom:none}
+#s4 .next-date{font-family:'Bebas Neue',sans-serif;font-size:32px;color:#AAFF00;width:90px;flex-shrink:0;line-height:1}
+#s4 .next-pipe{width:1px;height:44px;background:#222;flex-shrink:0}
+#s4 .next-match{font-size:28px;color:#fff;font-weight:500}
+#s4 .so-line{font-size:24px;color:rgba(170,255,0,0.35);font-style:italic;font-weight:300;margin-top:auto;padding-top:12px}
 </style>
 </head>
 <body>
 <div id="slide-render">
 
 <svg class="grain" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-  <filter id="gf">
-    <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="4" stitchTiles="stitch"/>
-    <feColorMatrix type="saturate" values="0"/>
-    <feBlend in="SourceGraphic" mode="overlay"/>
-  </filter>
+  <filter id="gf"><feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="4" stitchTiles="stitch"/>
+  <feColorMatrix type="saturate" values="0"/><feBlend in="SourceGraphic" mode="overlay"/></filter>
   <rect width="100%" height="100%" filter="url(#gf)" opacity="0.35"/>
 </svg>
 
 <!-- ══ SLIDE 1: SCOREBOARD ══ -->
 <div class="slide {{S1_ACTIVE}}" id="s1">
-  <div class="home-half"></div>
-  <div class="away-half"></div>
-  <div class="center-darken"></div>
-  <div class="divider"></div>
+  <div class="home-zone"></div>
+  <div class="away-zone"></div>
+  <div class="darken"></div>
+  <div class="slash"></div>
   <div class="bug">SPORT. DECODED.</div>
   <div class="inner">
     <div class="stage-label">{{STAGE}} · {{GROUP}} · {{MATCH_DATE}}</div>
@@ -355,10 +212,12 @@ body{background:#0a0a0a;margin:0;padding:0}
 
 <!-- ══ SLIDE 2: THE MOMENT ══ -->
 <div class="slide {{S2_ACTIVE}}" id="s2">
-  <div class="team-wash"></div>
-  <div class="accent-bar"></div>
+  <div class="home-wash"></div>
+  <div class="away-wash"></div>
   <div class="ghost">{{MOMENT_STAT}}</div>
+  <div class="v-bar"></div>
   <div class="bug">SPORT. DECODED.</div>
+  <div class="score-pill">{{SCORE_PILL}}</div>
   <div class="inner">
     <div class="moment-label">{{MOMENT_LABEL}}</div>
     <div class="moment-num">{{MOMENT_STAT}}<span class="moment-unit">{{MOMENT_UNIT}}</span></div>
@@ -378,83 +237,82 @@ body{background:#0a0a0a;margin:0;padding:0}
   <div class="sc">02 / 04</div>
 </div>
 
-<!-- ══ SLIDE 3: THE BREAKDOWN ══ -->
+<!-- ══ SLIDE 3: HEAD TO HEAD ══ -->
 <div class="slide {{S3_ACTIVE}}" id="s3">
+  <div class="home-edge"></div>
+  <div class="away-edge"></div>
+  <div class="ghost">VS</div>
   <div class="bug">SPORT. DECODED.</div>
+  <div class="score-pill">{{SCORE_PILL}}</div>
   <div class="inner">
     <div class="breakdown-label">Head to Head</div>
     <div class="team-headers">
-      <div class="th-home" style="color:{{HOME_COLOR}}">{{HOME_CODE}}</div>
-      <div class="th-away" style="color:{{AWAY_COLOR}}">{{AWAY_CODE}}</div>
+      <div class="th-home">{{HOME_CODE}}</div>
+      <div class="th-away">{{AWAY_CODE}}</div>
     </div>
 
-    <!-- Metric 1 -->
     <div class="metric-row">
       <div class="metric-label">{{METRIC1_LABEL}}</div>
       <div class="metric-bars">
-        <div class="metric-val-home {{METRIC1_HOME_W == 'true' ? 'winner' : 'loser'}}">{{METRIC1_HOME}}</div>
-        <div class="bar-container">
-          <div class="bar-home {{METRIC1_HOME_W == 'true' ? 'winner' : 'loser'}}" style="width:50%;margin-left:auto"></div>
-          <div class="bar-divider"></div>
-          <div class="bar-away {{METRIC1_HOME_W == 'true' ? 'loser' : 'winner'}}" style="width:50%"></div>
+        <div class="metric-val-home" style="color:{{METRIC1_HOME_VAL_COLOR}}">{{METRIC1_HOME}}</div>
+        <div class="bar-wrap">
+          <div class="bar-h" style="width:{{METRIC1_HOME_W}}%;background:{{METRIC1_HOME_COLOR}}"></div>
+          <div class="bar-div"></div>
+          <div class="bar-a" style="width:{{METRIC1_AWAY_W}}%;background:{{METRIC1_AWAY_COLOR}}"></div>
         </div>
-        <div class="metric-val-away {{METRIC1_HOME_W == 'true' ? 'loser' : 'winner'}}">{{METRIC1_AWAY}}</div>
+        <div class="metric-val-away" style="color:{{METRIC1_AWAY_VAL_COLOR}}">{{METRIC1_AWAY}}</div>
       </div>
     </div>
 
-    <!-- Metric 2 -->
     <div class="metric-row">
       <div class="metric-label">{{METRIC2_LABEL}}</div>
       <div class="metric-bars">
-        <div class="metric-val-home {{METRIC2_HOME_W == 'true' ? 'winner' : 'loser'}}">{{METRIC2_HOME}}</div>
-        <div class="bar-container">
-          <div class="bar-home {{METRIC2_HOME_W == 'true' ? 'winner' : 'loser'}}" style="width:50%;margin-left:auto"></div>
-          <div class="bar-divider"></div>
-          <div class="bar-away {{METRIC2_HOME_W == 'true' ? 'loser' : 'winner'}}" style="width:50%"></div>
+        <div class="metric-val-home" style="color:{{METRIC2_HOME_VAL_COLOR}}">{{METRIC2_HOME}}</div>
+        <div class="bar-wrap">
+          <div class="bar-h" style="width:{{METRIC2_HOME_W}}%;background:{{METRIC2_HOME_COLOR}}"></div>
+          <div class="bar-div"></div>
+          <div class="bar-a" style="width:{{METRIC2_AWAY_W}}%;background:{{METRIC2_AWAY_COLOR}}"></div>
         </div>
-        <div class="metric-val-away {{METRIC2_HOME_W == 'true' ? 'loser' : 'winner'}}">{{METRIC2_AWAY}}</div>
+        <div class="metric-val-away" style="color:{{METRIC2_AWAY_VAL_COLOR}}">{{METRIC2_AWAY}}</div>
       </div>
     </div>
 
-    <!-- Metric 3 -->
     <div class="metric-row">
       <div class="metric-label">{{METRIC3_LABEL}}</div>
       <div class="metric-bars">
-        <div class="metric-val-home {{METRIC3_HOME_W == 'true' ? 'winner' : 'loser'}}">{{METRIC3_HOME}}</div>
-        <div class="bar-container">
-          <div class="bar-home {{METRIC3_HOME_W == 'true' ? 'winner' : 'loser'}}" style="width:50%;margin-left:auto"></div>
-          <div class="bar-divider"></div>
-          <div class="bar-away {{METRIC3_HOME_W == 'true' ? 'loser' : 'winner'}}" style="width:50%"></div>
+        <div class="metric-val-home" style="color:{{METRIC3_HOME_VAL_COLOR}}">{{METRIC3_HOME}}</div>
+        <div class="bar-wrap">
+          <div class="bar-h" style="width:{{METRIC3_HOME_W}}%;background:{{METRIC3_HOME_COLOR}}"></div>
+          <div class="bar-div"></div>
+          <div class="bar-a" style="width:{{METRIC3_AWAY_W}}%;background:{{METRIC3_AWAY_COLOR}}"></div>
         </div>
-        <div class="metric-val-away {{METRIC3_HOME_W == 'true' ? 'loser' : 'winner'}}">{{METRIC3_AWAY}}</div>
+        <div class="metric-val-away" style="color:{{METRIC3_AWAY_VAL_COLOR}}">{{METRIC3_AWAY}}</div>
       </div>
     </div>
 
-    <!-- Metric 4 -->
     <div class="metric-row">
       <div class="metric-label">{{METRIC4_LABEL}}</div>
       <div class="metric-bars">
-        <div class="metric-val-home {{METRIC4_HOME_W == 'true' ? 'winner' : 'loser'}}">{{METRIC4_HOME}}</div>
-        <div class="bar-container">
-          <div class="bar-home {{METRIC4_HOME_W == 'true' ? 'winner' : 'loser'}}" style="width:50%;margin-left:auto"></div>
-          <div class="bar-divider"></div>
-          <div class="bar-away {{METRIC4_HOME_W == 'true' ? 'loser' : 'winner'}}" style="width:50%"></div>
+        <div class="metric-val-home" style="color:{{METRIC4_HOME_VAL_COLOR}}">{{METRIC4_HOME}}</div>
+        <div class="bar-wrap">
+          <div class="bar-h" style="width:{{METRIC4_HOME_W}}%;background:{{METRIC4_HOME_COLOR}}"></div>
+          <div class="bar-div"></div>
+          <div class="bar-a" style="width:{{METRIC4_AWAY_W}}%;background:{{METRIC4_AWAY_COLOR}}"></div>
         </div>
-        <div class="metric-val-away {{METRIC4_HOME_W == 'true' ? 'loser' : 'winner'}}">{{METRIC4_AWAY}}</div>
+        <div class="metric-val-away" style="color:{{METRIC4_AWAY_VAL_COLOR}}">{{METRIC4_AWAY}}</div>
       </div>
     </div>
 
-    <!-- Metric 5 -->
     <div class="metric-row">
       <div class="metric-label">{{METRIC5_LABEL}}</div>
       <div class="metric-bars">
-        <div class="metric-val-home {{METRIC5_HOME_W == 'true' ? 'winner' : 'loser'}}">{{METRIC5_HOME}}</div>
-        <div class="bar-container">
-          <div class="bar-home {{METRIC5_HOME_W == 'true' ? 'winner' : 'loser'}}" style="width:50%;margin-left:auto"></div>
-          <div class="bar-divider"></div>
-          <div class="bar-away {{METRIC5_HOME_W == 'true' ? 'loser' : 'winner'}}" style="width:50%"></div>
+        <div class="metric-val-home" style="color:{{METRIC5_HOME_VAL_COLOR}}">{{METRIC5_HOME}}</div>
+        <div class="bar-wrap">
+          <div class="bar-h" style="width:{{METRIC5_HOME_W}}%;background:{{METRIC5_HOME_COLOR}}"></div>
+          <div class="bar-div"></div>
+          <div class="bar-a" style="width:{{METRIC5_AWAY_W}}%;background:{{METRIC5_AWAY_COLOR}}"></div>
         </div>
-        <div class="metric-val-away {{METRIC5_HOME_W == 'true' ? 'loser' : 'winner'}}">{{METRIC5_AWAY}}</div>
+        <div class="metric-val-away" style="color:{{METRIC5_AWAY_VAL_COLOR}}">{{METRIC5_AWAY}}</div>
       </div>
     </div>
 
@@ -464,29 +322,28 @@ body{background:#0a0a0a;margin:0;padding:0}
 
 <!-- ══ SLIDE 4: VERDICT + NEXT ══ -->
 <div class="slide {{S4_ACTIVE}}" id="s4">
-  <div class="top-zone"></div>
-  <div class="volt-rule"></div>
+  <div class="home-zone"></div>
+  <div class="away-zone"></div>
+  <div class="slash"></div>
+  <div class="v-bar"></div>
   <div class="bug">SPORT. DECODED.</div>
+  <div class="score-pill">{{SCORE_PILL}}</div>
   <div class="inner">
     <div class="verdict-section">
       <div class="verdict-eyebrow">TRS Verdict</div>
-      <div class="verdict-line">{{VERDICT_LINE}}</div>
+      <div class="verdict-line">{{VERDICT_LINE}} <span>{{VERDICT_VOLT}}</span></div>
     </div>
     <div class="next-section">
       <div class="next-label">What's Next</div>
       <div class="next-row">
         <div class="next-date">{{NEXT1_DATE}}</div>
         <div class="next-pipe"></div>
-        <div>
-          <div class="next-match">{{NEXT1_MATCH}}</div>
-        </div>
+        <div class="next-match">{{NEXT1_MATCH}}</div>
       </div>
       <div class="next-row">
         <div class="next-date">{{NEXT2_DATE}}</div>
         <div class="next-pipe"></div>
-        <div>
-          <div class="next-match">{{NEXT2_MATCH}}</div>
-        </div>
+        <div class="next-match">{{NEXT2_MATCH}}</div>
       </div>
       <div class="so-line">{{SO_LINE}}</div>
     </div>
