@@ -107,19 +107,13 @@ body{background:#0a0a0a;margin:0;padding:0}
 #s3 .momentum-bar{display:flex;height:10px;border-radius:4px;overflow:hidden;gap:2px}
 #s3 .momentum-home{height:10px;border-radius:2px 0 0 2px}
 #s3 .momentum-away{height:10px;border-radius:0 2px 2px 0}
-/* Metric rows */
-.metric-row{margin-bottom:14px}
-/* Metric labels bumped */
-.metric-label{font-size:24px;color:rgba(255,255,255,0.4);letter-spacing:4px;text-transform:uppercase;text-align:center;margin-bottom:8px;font-weight:500}
-.metric-bars{display:flex;align-items:center;gap:8px}
-/* FIX: reduced width to prevent overlap */
-.metric-val-home{font-family:'Bebas Neue',sans-serif;font-size:68px;line-height:1;width:110px;text-align:right;flex-shrink:0}
-.metric-val-away{font-family:'Bebas Neue',sans-serif;font-size:68px;line-height:1;width:110px;text-align:left;flex-shrink:0}
-/* Mirrored bars from center */
-.bar-wrap{flex:1;display:flex;align-items:center;height:14px;position:relative}
-.bar-center{width:2px;height:20px;background:#222;flex-shrink:0;position:absolute;left:50%;transform:translateX(-50%);z-index:2}
-.bar-h{height:14px;border-radius:2px 0 0 2px;position:absolute;right:50%;margin-right:3px}
-.bar-a{height:14px;border-radius:0 2px 2px 0;position:absolute;left:50%;margin-left:3px}
+/* Metric rows — clean 3-column, no bars */
+.metric-row{margin-bottom:0;padding:18px 0;border-bottom:1px solid rgba(255,255,255,0.06)}
+.metric-row:last-child{border-bottom:none}
+.metric-row-inner{display:flex;align-items:center;justify-content:space-between}
+.metric-val-home{font-family:'Bebas Neue',sans-serif;font-size:72px;line-height:1;width:180px;text-align:left;flex-shrink:0}
+.metric-val-away{font-family:'Bebas Neue',sans-serif;font-size:72px;line-height:1;width:180px;text-align:right;flex-shrink:0}
+.metric-label{font-size:22px;color:rgba(255,255,255,0.4);letter-spacing:4px;text-transform:uppercase;text-align:center;font-weight:500;flex:1}
 
 /* ══ SLIDE 4: VERDICT + NEXT ══ */
 #s4{background:#0a0a0a}
@@ -245,62 +239,37 @@ body{background:#0a0a0a;margin:0;padding:0}
       </div>
     </div>
     <div class="metric-row">
-      <div class="metric-label">{{METRIC1_LABEL}}</div>
-      <div class="metric-bars">
+      <div class="metric-row-inner">
         <div class="metric-val-home" style="color:{{METRIC1_HOME_VAL_COLOR}}">{{METRIC1_HOME}}</div>
-        <div class="bar-wrap">
-          <div class="bar-center"></div>
-          <div class="bar-h" style="width:{{METRIC1_HOME_W}}%;background:{{METRIC1_HOME_COLOR}}"></div>
-          <div class="bar-a" style="width:{{METRIC1_AWAY_W}}%;background:{{METRIC1_AWAY_COLOR}}"></div>
-        </div>
+        <div class="metric-label">{{METRIC1_LABEL}}</div>
         <div class="metric-val-away" style="color:{{METRIC1_AWAY_VAL_COLOR}}">{{METRIC1_AWAY}}</div>
       </div>
     </div>
     <div class="metric-row">
-      <div class="metric-label">{{METRIC2_LABEL}}</div>
-      <div class="metric-bars">
+      <div class="metric-row-inner">
         <div class="metric-val-home" style="color:{{METRIC2_HOME_VAL_COLOR}}">{{METRIC2_HOME}}</div>
-        <div class="bar-wrap">
-          <div class="bar-center"></div>
-          <div class="bar-h" style="width:{{METRIC2_HOME_W}}%;background:{{METRIC2_HOME_COLOR}}"></div>
-          <div class="bar-a" style="width:{{METRIC2_AWAY_W}}%;background:{{METRIC2_AWAY_COLOR}}"></div>
-        </div>
+        <div class="metric-label">{{METRIC2_LABEL}}</div>
         <div class="metric-val-away" style="color:{{METRIC2_AWAY_VAL_COLOR}}">{{METRIC2_AWAY}}</div>
       </div>
     </div>
     <div class="metric-row">
-      <div class="metric-label">{{METRIC3_LABEL}}</div>
-      <div class="metric-bars">
+      <div class="metric-row-inner">
         <div class="metric-val-home" style="color:{{METRIC3_HOME_VAL_COLOR}}">{{METRIC3_HOME}}</div>
-        <div class="bar-wrap">
-          <div class="bar-center"></div>
-          <div class="bar-h" style="width:{{METRIC3_HOME_W}}%;background:{{METRIC3_HOME_COLOR}}"></div>
-          <div class="bar-a" style="width:{{METRIC3_AWAY_W}}%;background:{{METRIC3_AWAY_COLOR}}"></div>
-        </div>
+        <div class="metric-label">{{METRIC3_LABEL}}</div>
         <div class="metric-val-away" style="color:{{METRIC3_AWAY_VAL_COLOR}}">{{METRIC3_AWAY}}</div>
       </div>
     </div>
     <div class="metric-row">
-      <div class="metric-label">{{METRIC4_LABEL}}</div>
-      <div class="metric-bars">
+      <div class="metric-row-inner">
         <div class="metric-val-home" style="color:{{METRIC4_HOME_VAL_COLOR}}">{{METRIC4_HOME}}</div>
-        <div class="bar-wrap">
-          <div class="bar-center"></div>
-          <div class="bar-h" style="width:{{METRIC4_HOME_W}}%;background:{{METRIC4_HOME_COLOR}}"></div>
-          <div class="bar-a" style="width:{{METRIC4_AWAY_W}}%;background:{{METRIC4_AWAY_COLOR}}"></div>
-        </div>
+        <div class="metric-label">{{METRIC4_LABEL}}</div>
         <div class="metric-val-away" style="color:{{METRIC4_AWAY_VAL_COLOR}}">{{METRIC4_AWAY}}</div>
       </div>
     </div>
     <div class="metric-row">
-      <div class="metric-label">{{METRIC5_LABEL}}</div>
-      <div class="metric-bars">
+      <div class="metric-row-inner">
         <div class="metric-val-home" style="color:{{METRIC5_HOME_VAL_COLOR}}">{{METRIC5_HOME}}</div>
-        <div class="bar-wrap">
-          <div class="bar-center"></div>
-          <div class="bar-h" style="width:{{METRIC5_HOME_W}}%;background:{{METRIC5_HOME_COLOR}}"></div>
-          <div class="bar-a" style="width:{{METRIC5_AWAY_W}}%;background:{{METRIC5_AWAY_COLOR}}"></div>
-        </div>
+        <div class="metric-label">{{METRIC5_LABEL}}</div>
         <div class="metric-val-away" style="color:{{METRIC5_AWAY_VAL_COLOR}}">{{METRIC5_AWAY}}</div>
       </div>
     </div>
