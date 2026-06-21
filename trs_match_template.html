@@ -1,37 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <!--
-TRS MATCH RESULT TEMPLATE v3
-All enhancements applied:
-- Slide 1: steeper diagonal, goal scorers, team name bump
-- Slide 2: Bebas Neue moment_unit, HOME_COLOR accent bar, text bumped
-- Slide 3: mirrored bars, momentum indicator, text bumped
-- Slide 4: fixture section above diagonal slash, text bumped
-- All slides: score pill with flags, text sizes bumped throughout
-
-VARIABLES:
-{{HOME_TEAM}} {{HOME_CODE}} {{HOME_COLOR}} {{HOME_SCORE}} {{HOME_FLAG}}
-{{AWAY_TEAM}} {{AWAY_CODE}} {{AWAY_COLOR}} {{AWAY_SCORE}} {{AWAY_FLAG}}
-{{MATCH_DATE}} {{GROUP}} {{VENUE}} {{STAGE}}
-{{SCORE_PILL}} — e.g. "🇨🇿 CZE 1–1 RSA 🇿🇦"
-{{HOME_SCORERS}} — e.g. "CZE: Novak 23' · Soucek 71'"
-{{AWAY_SCORERS}} — e.g. "RSA: Tau 67'"
-{{SCORER_FONT_SIZE}} — integer e.g. 26
-{{MOMENT_LABEL}} {{MOMENT_STAT}} {{MOMENT_UNIT}} {{MOMENT_BODY}}
-{{MOMENT_SUB1_NUM}} {{MOMENT_SUB1_LABEL}}
-{{MOMENT_SUB2_NUM}} {{MOMENT_SUB2_LABEL}}
-{{METRIC1-5_LABEL}} {{METRIC1-5_HOME}} {{METRIC1-5_AWAY}}
-{{METRIC1-5_HOME_COLOR}} {{METRIC1-5_AWAY_COLOR}}
-{{METRIC1-5_HOME_VAL_COLOR}} {{METRIC1-5_AWAY_VAL_COLOR}}
-{{METRIC1-5_HOME_W}} {{METRIC1-5_AWAY_W}}
-{{MOMENTUM_HOME_W}} — integer 0-100, home momentum bar width
-{{MOMENTUM_AWAY_W}} — integer 0-100, away momentum bar width
-{{MOMENTUM_HOME_COLOR}} — home color or dimmed
-{{MOMENTUM_AWAY_COLOR}} — away color or dimmed
-{{VERDICT_LINE}} {{VERDICT_VOLT}}
-{{NEXT1_DATE}} {{NEXT1_MATCH}}
-{{NEXT2_DATE}} {{NEXT2_MATCH}}
-{{SO_LINE}}
+TRS MATCH RESULT TEMPLATE v4 — LOCKED DESIGN
+All fixes applied:
+- Slide 1: stage/FT/scorers above slash, ghost pulled in + clearer
+- Slide 2: all text bumped, ghost pulled in + clearer
+- Slide 3: bar overlap fixed, all text bumped, ghost clearer
+- Slide 4: slash behind all content, zones aligned to slash, text bumped
+- Global: bug, sc, pill all bumped
 -->
 <head>
 <meta charset="UTF-8">
@@ -46,84 +22,100 @@ body{background:#0a0a0a;margin:0;padding:0}
 .grain{position:absolute;inset:0;z-index:50;pointer-events:none;opacity:0.45;mix-blend-mode:overlay}
 .slide{position:absolute;inset:0;display:none;flex-direction:column}
 .slide.active{display:flex}
-.bug{position:absolute;top:44px;left:48px;z-index:20;font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:8px;color:#AAFF00}
-.sc{position:absolute;bottom:36px;right:44px;z-index:20;font-family:'Bebas Neue',sans-serif;font-size:38px;color:rgba(170,255,0,0.18);letter-spacing:3px;line-height:1}
-/* Score pill with flags */
+/* Global chrome — bumped */
+.bug{position:absolute;top:44px;left:48px;z-index:20;font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:8px;color:#AAFF00}
+.sc{position:absolute;bottom:36px;right:44px;z-index:20;font-family:'Bebas Neue',sans-serif;font-size:44px;color:rgba(170,255,0,0.18);letter-spacing:3px;line-height:1}
+/* Score pill — bumped */
 .score-pill{
   position:absolute;top:44px;right:48px;z-index:20;
   background:rgba(0,0,0,0.55);border:1px solid rgba(170,255,0,0.28);
-  padding:12px 28px;border-radius:4px;
-  font-family:'Bebas Neue',sans-serif;font-size:34px;
+  padding:14px 32px;border-radius:4px;
+  font-family:'Bebas Neue',sans-serif;font-size:38px;
   letter-spacing:3px;color:#AAFF00
 }
-/* Volt left accent bar */
-.v-bar{position:absolute;left:0;top:0;bottom:0;width:8px;background:#AAFF00;z-index:10}
 
 /* ══ SLIDE 1: SCOREBOARD ══ */
 #s1 .home-zone{position:absolute;inset:0;background:{{HOME_COLOR}};clip-path:polygon(0 0,100% 0,50% 100%,0 100%)}
 #s1 .away-zone{position:absolute;inset:0;background:{{AWAY_COLOR}};clip-path:polygon(100% 0,100% 100%,50% 100%)}
 #s1 .darken{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,0.65) 0%,rgba(0,0,0,0.1) 45%,rgba(0,0,0,0.55) 100%)}
-/* Steeper diagonal slash ~20deg */
+/* Slash z-index 3 — all content sits above at z-index 10+ */
 #s1 .slash{
-  position:absolute;inset:0;z-index:5;
+  position:absolute;inset:0;z-index:3;
   background:linear-gradient(to bottom right,transparent calc(50% - 3px),#AAFF00 calc(50% - 3px),#AAFF00 calc(50% + 3px),transparent calc(50% + 3px));
   transform:rotate(-20deg) scale(1.6)
 }
+/* Ghost — pulled in, clearer */
+#s1 .ghost{
+  position:absolute;font-family:'Bebas Neue',sans-serif;
+  font-size:520px;line-height:1;color:#fff;opacity:0.06;
+  right:40px;bottom:20px;letter-spacing:-20px;pointer-events:none;z-index:4
+}
 #s1 .inner{position:relative;z-index:10;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
-#s1 .stage-label{font-size:26px;letter-spacing:8px;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:44px;font-weight:400}
-#s1 .teams-row{display:flex;align-items:center;justify-content:center;width:100%}
+/* Stage label above slash */
+#s1 .stage-label{font-size:30px;letter-spacing:8px;color:rgba(255,255,255,0.6);text-transform:uppercase;margin-bottom:40px;font-weight:400;position:relative;z-index:15}
+#s1 .teams-row{display:flex;align-items:center;justify-content:center;width:100%;position:relative;z-index:15}
 #s1 .team-block{flex:1;display:flex;flex-direction:column;align-items:center;gap:14px}
 #s1 .team-code{font-family:'Bebas Neue',sans-serif;font-size:148px;color:#fff;letter-spacing:8px;line-height:1}
-#s1 .team-name{font-size:26px;color:rgba(255,255,255,0.5);letter-spacing:5px;text-transform:uppercase;font-weight:400}
-#s1 .score-block{display:flex;align-items:center;padding:0 28px;flex-shrink:0}
+#s1 .team-name{font-size:28px;color:rgba(255,255,255,0.55);letter-spacing:5px;text-transform:uppercase;font-weight:400}
+#s1 .score-block{display:flex;align-items:center;padding:0 24px;flex-shrink:0}
 #s1 .score-num{font-family:'Bebas Neue',sans-serif;font-size:320px;line-height:0.88;color:#AAFF00;letter-spacing:-12px}
-#s1 .score-sep{font-family:'Bebas Neue',sans-serif;font-size:140px;color:rgba(255,255,255,0.15);padding:0 16px;line-height:1}
-#s1 .ft-badge{margin-top:32px;font-size:24px;letter-spacing:6px;color:rgba(170,255,0,0.55);font-weight:500;text-transform:uppercase}
-/* Goal scorers */
-#s1 .scorers{margin-top:20px;display:flex;flex-direction:column;align-items:center;gap:6px}
-#s1 .scorer-line{letter-spacing:2px;color:rgba(170,255,0,0.75);font-weight:500;text-align:center;font-family:'Inter',sans-serif}
+#s1 .score-sep{font-family:'Bebas Neue',sans-serif;font-size:140px;color:rgba(255,255,255,0.15);padding:0 12px;line-height:1}
+/* FT badge above slash */
+#s1 .ft-badge{margin-top:28px;font-size:28px;letter-spacing:6px;color:rgba(170,255,0,0.65);font-weight:500;text-transform:uppercase;position:relative;z-index:15}
+/* Scorers above slash */
+#s1 .scorers{margin-top:16px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;z-index:15}
+#s1 .scorer-line{letter-spacing:2px;color:rgba(170,255,0,0.8);font-weight:500;text-align:center;font-family:'Inter',sans-serif}
 
 /* ══ SLIDE 2: THE MOMENT ══ */
 #s2{background:#0a0a0a}
 #s2 .home-wash{position:absolute;left:0;top:0;bottom:0;width:65%;background:linear-gradient(to right,{{HOME_COLOR}} 0%,transparent 100%);opacity:0.16;pointer-events:none}
 #s2 .away-wash{position:absolute;right:0;top:0;bottom:0;width:40%;background:linear-gradient(to left,{{AWAY_COLOR}} 0%,transparent 100%);opacity:0.1;pointer-events:none}
-#s2 .ghost{position:absolute;font-family:'Bebas Neue',sans-serif;font-size:600px;line-height:1;color:{{HOME_COLOR}};opacity:0.07;right:-20px;bottom:-40px;letter-spacing:-20px;pointer-events:none}
+/* Ghost — pulled in, clearer */
+#s2 .ghost{position:absolute;font-family:'Bebas Neue',sans-serif;font-size:560px;line-height:1;color:{{HOME_COLOR}};opacity:0.10;right:40px;bottom:20px;letter-spacing:-20px;pointer-events:none}
 #s2 .inner{position:relative;z-index:5;flex:1;display:flex;flex-direction:column;padding:44px 56px 44px 72px;justify-content:center}
-#s2 .moment-label{font-size:24px;letter-spacing:8px;color:#AAFF00;text-transform:uppercase;font-weight:600;margin-bottom:20px}
+/* Moment label bumped */
+#s2 .moment-label{font-size:28px;letter-spacing:8px;color:#AAFF00;text-transform:uppercase;font-weight:600;margin-bottom:20px}
 #s2 .moment-num{font-family:'Bebas Neue',sans-serif;font-size:280px;line-height:0.82;color:#AAFF00;letter-spacing:-12px}
-/* FIX: Bebas Neue for moment_unit */
-#s2 .moment-unit{font-family:'Bebas Neue',sans-serif;font-size:88px;color:#fff;letter-spacing:2px;display:block;margin-top:8px;line-height:1}
-#s2 .moment-body{font-size:38px;color:#fff;font-weight:300;line-height:1.5;margin-top:24px;max-width:820px}
+#s2 .moment-unit{font-family:'Bebas Neue',sans-serif;font-size:92px;color:#fff;letter-spacing:2px;display:block;margin-top:8px;line-height:1}
+/* Moment body bumped */
+#s2 .moment-body{font-size:42px;color:#fff;font-weight:300;line-height:1.5;margin-top:24px;max-width:820px}
 #s2 .sub-rule{width:100%;height:1px;background:#1a1a1a;margin:32px 0}
 #s2 .sub-stats{display:flex;gap:0}
 #s2 .sub-block{flex:1;border-right:1px solid #1a1a1a;padding-right:32px;margin-right:32px}
 #s2 .sub-block:last-child{border-right:none;padding-right:0;margin-right:0}
-#s2 .sub-num{font-family:'Bebas Neue',sans-serif;font-size:80px;color:#AAFF00;line-height:1}
-#s2 .sub-label{font-size:22px;color:#fff;letter-spacing:3px;text-transform:uppercase;margin-top:6px;font-weight:500}
+/* Sub stat numbers bumped */
+#s2 .sub-num{font-family:'Bebas Neue',sans-serif;font-size:96px;color:#AAFF00;line-height:1}
+/* Sub stat labels bumped */
+#s2 .sub-label{font-size:26px;color:#fff;letter-spacing:3px;text-transform:uppercase;margin-top:8px;font-weight:500}
 
 /* ══ SLIDE 3: HEAD TO HEAD ══ */
 #s3{background:#0a0a0a}
 #s3 .home-edge{position:absolute;left:0;top:0;bottom:0;width:7px;background:{{HOME_COLOR}}}
 #s3 .away-edge{position:absolute;right:0;top:0;bottom:0;width:7px;background:{{AWAY_COLOR}}}
-#s3 .ghost{position:absolute;font-family:'Bebas Neue',sans-serif;font-size:500px;line-height:1;color:#AAFF00;opacity:0.03;left:50%;top:50%;transform:translate(-50%,-50%);letter-spacing:-16px;pointer-events:none;white-space:nowrap}
-#s3 .inner{position:relative;z-index:5;flex:1;display:flex;flex-direction:column;padding:32px 72px;justify-content:center}
-#s3 .breakdown-label{font-size:22px;letter-spacing:8px;color:#AAFF00;text-transform:uppercase;font-weight:600;margin-bottom:10px}
-#s3 .team-headers{display:flex;justify-content:space-between;margin-bottom:16px;align-items:baseline}
-#s3 .th-home{font-family:'Bebas Neue',sans-serif;font-size:84px;letter-spacing:4px;line-height:1;color:{{HOME_COLOR}}}
-#s3 .th-away{font-family:'Bebas Neue',sans-serif;font-size:84px;letter-spacing:4px;line-height:1;text-align:right;color:{{AWAY_COLOR}}}
+/* Ghost VS — pulled in, clearer */
+#s3 .ghost{position:absolute;font-family:'Bebas Neue',sans-serif;font-size:480px;line-height:1;color:#AAFF00;opacity:0.06;left:50%;top:50%;transform:translate(-50%,-50%);letter-spacing:-16px;pointer-events:none;white-space:nowrap}
+#s3 .inner{position:relative;z-index:5;flex:1;display:flex;flex-direction:column;padding:28px 80px;justify-content:center}
+/* Breakdown label bumped */
+#s3 .breakdown-label{font-size:26px;letter-spacing:8px;color:#AAFF00;text-transform:uppercase;font-weight:600;margin-bottom:10px}
+#s3 .team-headers{display:flex;justify-content:space-between;margin-bottom:14px;align-items:baseline}
+/* Team headers bumped */
+#s3 .th-home{font-family:'Bebas Neue',sans-serif;font-size:96px;letter-spacing:4px;line-height:1;color:{{HOME_COLOR}}}
+#s3 .th-away{font-family:'Bebas Neue',sans-serif;font-size:96px;letter-spacing:4px;line-height:1;text-align:right;color:{{AWAY_COLOR}}}
 /* Momentum indicator */
-#s3 .momentum-wrap{margin-bottom:18px}
-#s3 .momentum-label{font-size:18px;color:rgba(255,255,255,0.3);letter-spacing:4px;text-transform:uppercase;text-align:center;margin-bottom:8px;font-weight:500}
+#s3 .momentum-wrap{margin-bottom:16px}
+#s3 .momentum-label{font-size:22px;color:rgba(255,255,255,0.35);letter-spacing:4px;text-transform:uppercase;text-align:center;margin-bottom:8px;font-weight:500}
 #s3 .momentum-bar{display:flex;height:10px;border-radius:4px;overflow:hidden;gap:2px}
 #s3 .momentum-home{height:10px;border-radius:2px 0 0 2px}
 #s3 .momentum-away{height:10px;border-radius:0 2px 2px 0}
 /* Metric rows */
-.metric-row{margin-bottom:16px}
-.metric-label{font-size:20px;color:rgba(255,255,255,0.4);letter-spacing:4px;text-transform:uppercase;text-align:center;margin-bottom:8px;font-weight:500}
-.metric-bars{display:flex;align-items:center;gap:10px}
-.metric-val-home{font-family:'Bebas Neue',sans-serif;font-size:72px;line-height:1;width:140px;text-align:right;flex-shrink:0}
-.metric-val-away{font-family:'Bebas Neue',sans-serif;font-size:72px;line-height:1;width:140px;text-align:left;flex-shrink:0}
-/* FIX: mirrored bars — home extends right→left from center, away extends left→right */
+.metric-row{margin-bottom:14px}
+/* Metric labels bumped */
+.metric-label{font-size:24px;color:rgba(255,255,255,0.4);letter-spacing:4px;text-transform:uppercase;text-align:center;margin-bottom:8px;font-weight:500}
+.metric-bars{display:flex;align-items:center;gap:8px}
+/* FIX: reduced width to prevent overlap */
+.metric-val-home{font-family:'Bebas Neue',sans-serif;font-size:68px;line-height:1;width:110px;text-align:right;flex-shrink:0}
+.metric-val-away{font-family:'Bebas Neue',sans-serif;font-size:68px;line-height:1;width:110px;text-align:left;flex-shrink:0}
+/* Mirrored bars from center */
 .bar-wrap{flex:1;display:flex;align-items:center;height:14px;position:relative}
 .bar-center{width:2px;height:20px;background:#222;flex-shrink:0;position:absolute;left:50%;transform:translateX(-50%);z-index:2}
 .bar-h{height:14px;border-radius:2px 0 0 2px;position:absolute;right:50%;margin-right:3px}
@@ -131,29 +123,35 @@ body{background:#0a0a0a;margin:0;padding:0}
 
 /* ══ SLIDE 4: VERDICT + NEXT ══ */
 #s4{background:#0a0a0a}
-/* Team color zones behind content */
-#s4 .home-zone{position:absolute;inset:0;background:{{HOME_COLOR}};clip-path:polygon(0 0,100% 0,100% 52%,0 64%);opacity:0.18}
-#s4 .away-zone{position:absolute;inset:0;background:{{AWAY_COLOR}};clip-path:polygon(0 64%,100% 52%,100% 100%,0 100%);opacity:0.18}
-/* FIX: slash z-index 4 so content (z-index 10) sits above it */
+/* Team color zones — clip-path aligned to slash angle */
+#s4 .home-zone{position:absolute;inset:0;background:{{HOME_COLOR}};clip-path:polygon(0 0,100% 0,100% 52%,0 65%);opacity:0.2}
+#s4 .away-zone{position:absolute;inset:0;background:{{AWAY_COLOR}};clip-path:polygon(0 65%,100% 52%,100% 100%,0 100%);opacity:0.2}
+/* FIX: slash z-index 2 — firmly behind all content */
 #s4 .slash{
-  position:absolute;top:0;left:0;right:0;bottom:0;z-index:4;
+  position:absolute;top:0;left:0;right:0;bottom:0;z-index:2;
   background:linear-gradient(to bottom,transparent calc(58% - 2px),#AAFF00 calc(58% - 2px),#AAFF00 calc(58% + 2px),transparent calc(58% + 2px));
   transform:rotate(-3deg) scale(1.1)
 }
 #s4 .inner{position:relative;z-index:10;flex:1;display:flex;flex-direction:column;padding:44px 56px}
 #s4 .verdict-section{flex:0 0 56%;display:flex;flex-direction:column;justify-content:center}
-#s4 .verdict-eyebrow{font-size:20px;letter-spacing:8px;color:#AAFF00;text-transform:uppercase;font-weight:600;margin-bottom:18px}
-#s4 .verdict-line{font-family:'Bebas Neue',sans-serif;font-size:92px;line-height:0.9;color:#fff;letter-spacing:-1px}
+/* Verdict eyebrow bumped */
+#s4 .verdict-eyebrow{font-size:24px;letter-spacing:8px;color:#AAFF00;text-transform:uppercase;font-weight:600;margin-bottom:18px}
+/* Verdict line bumped */
+#s4 .verdict-line{font-family:'Bebas Neue',sans-serif;font-size:96px;line-height:0.9;color:#fff;letter-spacing:-1px}
 #s4 .verdict-line span{color:#AAFF00}
-/* FIX: next section sits above slash via z-index, padding-top pushes below slash visually */
+/* Next section — z-index 10, locked above slash */
 #s4 .next-section{flex:0 0 44%;display:flex;flex-direction:column;justify-content:flex-start;padding-top:16px;position:relative;z-index:10}
-#s4 .next-label{font-size:18px;letter-spacing:6px;color:rgba(170,255,0,0.5);text-transform:uppercase;font-weight:600;margin-bottom:14px}
-#s4 .next-row{display:flex;align-items:center;gap:24px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.08)}
+/* Next label bumped */
+#s4 .next-label{font-size:22px;letter-spacing:6px;color:rgba(170,255,0,0.55);text-transform:uppercase;font-weight:600;margin-bottom:14px}
+#s4 .next-row{display:flex;align-items:center;gap:24px;padding:16px 0;border-bottom:1px solid rgba(255,255,255,0.08)}
 #s4 .next-row:last-of-type{border-bottom:none}
-#s4 .next-date{font-family:'Bebas Neue',sans-serif;font-size:36px;color:#AAFF00;width:96px;flex-shrink:0;line-height:1}
-#s4 .next-pipe{width:1px;height:44px;background:#222;flex-shrink:0}
-#s4 .next-match{font-size:30px;color:#fff;font-weight:500}
-#s4 .so-line{font-size:26px;color:rgba(170,255,0,0.35);font-style:italic;font-weight:300;margin-top:auto;padding-top:12px}
+/* Next date bumped */
+#s4 .next-date{font-family:'Bebas Neue',sans-serif;font-size:44px;color:#AAFF00;width:100px;flex-shrink:0;line-height:1}
+#s4 .next-pipe{width:1px;height:48px;background:#222;flex-shrink:0}
+/* Next match bumped */
+#s4 .next-match{font-size:36px;color:#fff;font-weight:500}
+/* So line bumped + pulled up */
+#s4 .so-line{font-size:30px;color:rgba(170,255,0,0.38);font-style:italic;font-weight:300;margin-top:16px;padding-top:8px}
 </style>
 </head>
 <body>
@@ -171,6 +169,7 @@ body{background:#0a0a0a;margin:0;padding:0}
   <div class="away-zone"></div>
   <div class="darken"></div>
   <div class="slash"></div>
+  <div class="ghost">{{HOME_SCORE}}{{AWAY_SCORE}}</div>
   <div class="bug">SPORT. DECODED.</div>
   <div class="inner">
     <div class="stage-label">{{STAGE}} · {{GROUP}} · {{MATCH_DATE}}</div>
@@ -203,7 +202,6 @@ body{background:#0a0a0a;margin:0;padding:0}
   <div class="home-wash"></div>
   <div class="away-wash"></div>
   <div class="ghost">{{MOMENT_STAT}}</div>
-  <!-- FIX: accent bar uses HOME_COLOR -->
   <div style="position:absolute;left:0;top:0;bottom:0;width:8px;background:{{HOME_COLOR}};z-index:10"></div>
   <div class="bug">SPORT. DECODED.</div>
   <div class="score-pill">{{SCORE_PILL}}</div>
@@ -239,8 +237,6 @@ body{background:#0a0a0a;margin:0;padding:0}
       <div class="th-home">{{HOME_CODE}}</div>
       <div class="th-away">{{AWAY_CODE}}</div>
     </div>
-
-    <!-- Momentum indicator -->
     <div class="momentum-wrap">
       <div class="momentum-label">Match Momentum</div>
       <div class="momentum-bar">
@@ -248,8 +244,6 @@ body{background:#0a0a0a;margin:0;padding:0}
         <div class="momentum-away" style="width:{{MOMENTUM_AWAY_W}}%;background:{{MOMENTUM_AWAY_COLOR}}"></div>
       </div>
     </div>
-
-    <!-- Metric 1 -->
     <div class="metric-row">
       <div class="metric-label">{{METRIC1_LABEL}}</div>
       <div class="metric-bars">
@@ -262,8 +256,6 @@ body{background:#0a0a0a;margin:0;padding:0}
         <div class="metric-val-away" style="color:{{METRIC1_AWAY_VAL_COLOR}}">{{METRIC1_AWAY}}</div>
       </div>
     </div>
-
-    <!-- Metric 2 -->
     <div class="metric-row">
       <div class="metric-label">{{METRIC2_LABEL}}</div>
       <div class="metric-bars">
@@ -276,8 +268,6 @@ body{background:#0a0a0a;margin:0;padding:0}
         <div class="metric-val-away" style="color:{{METRIC2_AWAY_VAL_COLOR}}">{{METRIC2_AWAY}}</div>
       </div>
     </div>
-
-    <!-- Metric 3 -->
     <div class="metric-row">
       <div class="metric-label">{{METRIC3_LABEL}}</div>
       <div class="metric-bars">
@@ -290,8 +280,6 @@ body{background:#0a0a0a;margin:0;padding:0}
         <div class="metric-val-away" style="color:{{METRIC3_AWAY_VAL_COLOR}}">{{METRIC3_AWAY}}</div>
       </div>
     </div>
-
-    <!-- Metric 4 -->
     <div class="metric-row">
       <div class="metric-label">{{METRIC4_LABEL}}</div>
       <div class="metric-bars">
@@ -304,8 +292,6 @@ body{background:#0a0a0a;margin:0;padding:0}
         <div class="metric-val-away" style="color:{{METRIC4_AWAY_VAL_COLOR}}">{{METRIC4_AWAY}}</div>
       </div>
     </div>
-
-    <!-- Metric 5 -->
     <div class="metric-row">
       <div class="metric-label">{{METRIC5_LABEL}}</div>
       <div class="metric-bars">
@@ -318,7 +304,6 @@ body{background:#0a0a0a;margin:0;padding:0}
         <div class="metric-val-away" style="color:{{METRIC5_AWAY_VAL_COLOR}}">{{METRIC5_AWAY}}</div>
       </div>
     </div>
-
   </div>
   <div class="sc">03 / 04</div>
 </div>
@@ -335,7 +320,6 @@ body{background:#0a0a0a;margin:0;padding:0}
       <div class="verdict-eyebrow">TRS Verdict</div>
       <div class="verdict-line">{{VERDICT_LINE}} <span>{{VERDICT_VOLT}}</span></div>
     </div>
-    <!-- FIX: next section z-index 10, sits above slash -->
     <div class="next-section">
       <div class="next-label">What's Next</div>
       <div class="next-row">
